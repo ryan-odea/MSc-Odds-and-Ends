@@ -1,0 +1,138 @@
+---
+title: "Midterm Exam"
+author: "Ryan O'Dea"
+date: "11/2/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(
+  ggplot2,
+  knitr,
+  rstan,
+  rstanarm,
+  arm,
+  tidyverse,
+  broom,
+  pwr,
+  simr,
+  lmertest
+)
+```
+
+## Instruction
+
+This is your midterm exam that you are expected to work on it alone.  You may NOT  discuss any of the content of your exam with anyone except your instructor. This includes text, chat, email and other online forums.  We expect you to respect and follow the [GRS Academic and Professional Conduct Code](http://www.bu.edu/cas/files/2017/02/GRS-Academic-Conduct-Code-Final.pdf). 
+
+Although you may NOT ask anyone directly, you are allowed to use external resources such as R codes on the Internet.  If you do use someone's code, please make sure you clearly cite the origin of the code.
+
+When you finish, please compile and submit the PDF file and the link to the GitHub repository that contains the entire analysis.
+
+
+## Introduction
+
+In this exam, you will act as both the client and the consultant for the data that you collected in the data collection exercise (20pts).  Please note that you are not allowed to change the data.  The goal of this exam is to demonstrate your ability to perform the statistical analysis that you learned in this class so far.  It is important to note that significance of the analysis is not the main goal of this exam but the focus is on the appropriateness of your approaches.
+
+### Data Description (10pts)
+
+Please explain what your data is about and what the comparison of interest is.  In the process, please make sure to demonstrate that you can load your data properly into R.
+
+The monstera data set compares vine number (the lower, the large and closer to the center of the pot) to the leaf distance from the topsoil, the midrib length (effectively-leaf size), and number of holes in the leaf.
+
+```{r }
+#Raw Data Intake
+monstera <- read.csv(file.choose())
+monstera$Vine <- as.factor(monstera$Vine)
+
+#Creation of a log model
+log.monstera=data.frame(monstera$Vine,log(monstera$Distance),log(monstera$Midrib))
+log.monstera<- log.monstera %>%
+  rename(
+    Vine=monstera.Vine,
+    log.distance=log.monstera.Distance.,
+    log.midrib=log.monstera.Midrib.
+  )
+```
+
+### EDA (10pts)
+
+Please create one (maybe two) figure(s) that highlights the contrast of interest.  Make sure you think ahead and match your figure with the analysis.  For example, if your model requires you to take a log, make sure you take log in the figure as well.
+
+```{r }
+ggplot(monstera, aes(x=Distance, y=Midrib, group=Vine, color=Vine)) + geom_line() + labs(y="Midrib Length (CM)", x="Distance from Topsoil (CM)")
+ggplot(log.monstera, aes(x=log.distance, y=log.midrib, group=Vine, color=Vine)) + geom_line() + labs(y="Log Midrib Length (CM)", x=" Log Distance from Topsoil (CM)")
+```
+
+### Power Analysis (10pts)
+
+Please perform power analysis on the project.  Use 80% power, the sample size you used and infer the level of effect size you will be able to detect.  Discuss whether your sample size was enough for the problem at hand.  Please note that method of power analysis should match the analysis.  Also, please clearly state why you should NOT use the effect size from the fitted model.
+
+If I wanted 80% power I would have needed a sample size of at least 55 (If I wanted to achieve an affect of .15 - medium.) Because the power calculation "is only provisional...and makes the strong assumption that our $\beta$ is equivalent to what we set it, we should avoid using the regression $\beta$. The estimate from regression is always met with a standard error, so if the true $\beta$ is less than our regression $\beta$ we will need a large sample size.
+
+(Comment out the attempt at a multilevel linear power estimation - unsure how to correct)
+
+```{r }
+pwr.f2.test(u=2,f2=(.15/(1-.15)), sig.level = .05, power=.8)
+
+# signif <- rep(NA, n.sims=1000)
+# for (s in 1:1000){
+#   theta.hat <- fixef(fit)["distance:log.midrib"]
+#   theta.se <- se.fixef(fit)["distance:log.midrib"]
+#   signif[s] <- (theta.hat-2*theta.se)>0
+# }
+# mean(signif)
+```
+
+
+### Modeling (10pts)
+
+Please pick a regression model that best fits your data and fit your model.  Please make sure you describe why you decide to choose the model. Also, if you are using GLM, make sure you explain your choice of link function as well.
+```{r }
+fit=lmer(log.midrib ~ log.distance + (1 + log.distance | Vine), data=log.monstera)
+display(fit)
+
+
+ggplot(log.monstera, aes(x=log.distance, y=log.midrib, group=Vine, color=Vine)) + 
+geom_line() + geom_point() +
+geom_smooth(method = lm, se = FALSE, fullrange=TRUE, linetype = "dashed") +
+theme_classic()
+```
+
+### Validation (10pts)
+
+Please perform a necessary validation and argue why your choice of the model is appropriate. 
+As the data was grouped and had high variance, the log was first taken as a variance stabilizing measure. Afterward a Multilevel Linear Model was developed as each grouping appeared to have a difference intercept and slope, additionally as each vine resides in the same pot, but is independant in it's growth, I made the assumption that each would grow it's respective leaves differently.
+
+With the exception of one outlier, the QQ plot looks normal and the fit has a relatively low AIC value.
+
+```{r }
+qqnorm(residuals(fit))
+#print(AIC(fit)) 20.916
+```
+
+
+### Inference (10pts)
+
+Based on the result so far please perform statistical inference to compare the comparison of interest.
+
+Based on the lmer fit displayed above, we can make the inference that for every one unit (cm) increase in distance, we would expect about 16% less midrib length per leaf.
+
+
+### Discussion (10pts)
+
+Please clearly state your conclusion and the implication of the result.
+
+This would implicate that the further the leaf grows from the topsoil, the smaller it generally will be. At face value, this makes sense. The Monstera Adonsonii will only grow leaves from the tip of the vine (the farthest away point), therefore the newer, smaller leaves, will have the most dinstance where the older growth leaves will be closer to the topsoil.
+
+### Limitations and future opportunity. (10pts)
+
+Please list concerns about your analysis.  Also, please state how you might go about fixing the problem in your future study.
+
+The primary concerns about this analysis is the extremely small sample size and the potential error for data collection. During collection I only had a tape measure, but Monstera Adonsonii vines can be very "windy" and difficult to measure, leading to slight error in the distance from topsoil measurement.
+If I were to repeat this study, I would consider having more than one vase of plants and use a maleable tape measure compared to the rigid one used. Additionally, I would try to mark down times when watering/fertilizing to attempt to ensure uniform growth over a period of time.
+
+
+### Comments or questions
+If you have any comments or questions, please write them here.
+
