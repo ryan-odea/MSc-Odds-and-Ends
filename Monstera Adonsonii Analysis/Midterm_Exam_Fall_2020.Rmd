@@ -75,13 +75,14 @@ If I wanted 80% power I would have needed a sample size of at least 55 (If I wan
 ```{r }
 pwr.f2.test(u=2,f2=(.15/(1-.15)), sig.level = .05, power=.8)
 
-# signif <- rep(NA, n.sims=1000)
-# for (s in 1:1000){
-#   theta.hat <- fixef(fit)["distance:log.midrib"]
-#   theta.se <- se.fixef(fit)["distance:log.midrib"]
-#   signif[s] <- (theta.hat-2*theta.se)>0
-# }
-# mean(signif)
+signif <- rep(NA, n.sims=1000)
+for (s in 1:1000){
+  browser()
+  theta.hat <- fixef(fit)["distance:log.midrib"]
+  theta.se <- se.fixef(fit)["distance:log.midrib"]
+  signif[s] <- (theta.hat-2*theta.se)>0
+}
+mean(signif)
 ```
 
 
