@@ -11,49 +11,88 @@ pacman::p_load(
   gganimate,
   tidyquant,
   tidyverse,
-  lubridate
+  lubridate,
+  ggExtra,
+  wesanderson
 )
 ```
 
-## GGAnimate
+## ggExtra - Side Density Plots
 ```{r}
-#Scraping SP500 ------------------------
-today <- Sys.Date()
-sp500 <- new.env()
+#Chess Games from Lichess (https://www.kaggle.com/datasnaek/chess) ------------------------
+chess <- read.csv(file = "games.csv")
+chess <- chess %>% filter(victory_status != "outoftime")
+chess_rated <- chess %>% filter(rated == "TRUE")
 
-invisible(
-getSymbols("^GSPC",env = sp500, src = "yahoo",
-           from = as.Date("2020-01-22"), to = as.Date(today)))
+#All Rated Games---------------------------------
+chess_rated_wins <- chess_rated %>%
+ggplot(aes(x = white_rating, y = black_rating, group = victory_status, col = victory_status)) + 
+  geom_point(alpha = .5) + 
+  theme_gray() + 
+  geom_smooth(aes(group = victory_status), se = FALSE) + 
+  labs(title = "Lichess White vs Black Rating (Non-Subsetted)",
+       subtitle = "Data: https://www.kaggle.com/datasnaek/chess",
+       col = "Victory Type") + 
+  ylab("Black Rating") + 
+  xlab("White Rating") + 
+  scale_colour_manual(breaks = c("mate", "resign", "draw"),
+                      labels = c("Checkmate", "Resignation", "Draw"),
+                      values = c("#1B9E77",
+                                 "#D95F02",
+                                 "#7570B3"))
 
-GSPC <- sp500$GSPC
-GSPC <- tibble(date=index(GSPC),coredata(GSPC$GSPC.Close))
-names(GSPC)[names(GSPC) == "coredata(GSPC$GSPC.Close)"] <- "close"
-
-GSPC$delta <- Delt(GSPC$close)*100
-
-#Covid Data ----------------------------
-covid <- read.csv(file.choose())
-covid <- subset(covid, location == "United States")
-covid <- covid[c(4:6, 8)]
-covid$date <- as.Date(covid$date)
-
-#Merge and removal
-merged_df <- merge(covid, GSPC, by = "date")
-merged_df$delta_cases <- Delt(merged_df$new_cases)
-
-merged_df <- subset(merged_df, date >= "2020-03-04")
+all_wins <- ggMarginal(chess_rated_wins, groupColour = FALSE, groupFill = TRUE)
 
 
-#GGplotting
+#Where White wins
+chess_white <- filter(chess_rated, winner == "white")
+chess_rated_white <- chess_white %>%
+ggplot(aes(x = white_rating, y = black_rating, group = victory_status, col = victory_status)) + 
+  geom_point(alpha = .2) + 
+  theme_gray() + 
+  geom_smooth(aes(group = victory_status), se = FALSE) + 
+  labs(title = "Lichess White vs Black Rating (White Wins)",
+       subtitle = "Data: https://www.kaggle.com/datasnaek/chess",
+       col = "Victory Type") + 
+  ylab("Black Rating") + 
+  xlab("White Rating") + 
+  scale_colour_manual(breaks = c("mate", "resign"),
+                      labels = c("Checkmate", "Resignation"),
+                      values = c("#1B9E77",
+                                 "#D95F02"))
 
-anim <- ggplot(merged_df, aes(x=date, y= delta_cases)) + 
-  geom_path(aes(color = "New Cases")) + 
-  geom_path(aes(y = delta, color = "S&P500")) + 
-  labs(x = "Date", y = "Percent Change", col = "Symbol", title = "S&P 500 vs COVID-19 New Cases") + 
-  transition_reveal(along = as.numeric(date)) +
-  view_follow()
+white_wins <- ggMarginal(chess_rated_white, groupColour = FALSE, groupFill = TRUE)
 
-animate(anim, duration = 30, fps = 30, width = 3000, height = 1000, res = 300, renderer = gifski_renderer(loop = F))
-anim_save("spcovid.gif")
+#Where Black Wins
+chess_black <- filter(chess_rated, winner == "black")
+chess_rated_black <- chess_black %>%
+ggplot(aes(x = white_rating, y = black_rating, group = victory_status, col = victory_status)) + 
+  geom_point(alpha = .2) + 
+  theme_gray() + 
+  geom_smooth(aes(group = victory_status), se = FALSE) + 
+  labs(title = "Lichess White vs Black Rating (Black Wins)",
+       subtitle = "Data: https://www.kaggle.com/datasnaek/chess",
+       col = "Victory Type") + 
+  ylab("Black Rating") + 
+  xlab("White Rating") + 
+  scale_colour_manual(breaks = c("mate", "resign"),
+                      labels = c("Checkmate", "Resignation"),
+                      values = c("#1B9E77",
+                                 "#D95F02"))
+
+black_wins <- ggMarginal(chess_rated_black, groupColour = FALSE, groupFill = TRUE)
+
+ggsave("all_wins.png",
+       plot = all_wins,
+       height = 10, width = 15, dpi = 900)
+
+ggsave("white_wins.png",
+       plot = white_wins,
+       height = 10, width = 15, dpi = 900)
+
+ggsave("black_wins.png",
+       plot = black_wins,
+       height = 10, width = 15, dpi = 900)
+
 ```
 
