@@ -1,0 +1,59 @@
+---
+title: "Code-playground"
+author: "Ryan O'Dea"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(
+  ggplot2,
+  gganimate,
+  tidyquant,
+  tidyverse,
+  lubridate
+)
+```
+
+## GGAnimate
+```{r}
+#Scraping SP500 ------------------------
+today <- Sys.Date()
+sp500 <- new.env()
+
+invisible(
+getSymbols("^GSPC",env = sp500, src = "yahoo",
+           from = as.Date("2020-01-22"), to = as.Date(today)))
+
+GSPC <- sp500$GSPC
+GSPC <- tibble(date=index(GSPC),coredata(GSPC$GSPC.Close))
+names(GSPC)[names(GSPC) == "coredata(GSPC$GSPC.Close)"] <- "close"
+
+GSPC$delta <- Delt(GSPC$close)*100
+
+#Covid Data ----------------------------
+covid <- read.csv(file.choose())
+covid <- subset(covid, location == "United States")
+covid <- covid[c(4:6, 8)]
+covid$date <- as.Date(covid$date)
+
+#Merge and removal
+merged_df <- merge(covid, GSPC, by = "date")
+merged_df$delta_cases <- Delt(merged_df$new_cases)
+
+merged_df <- subset(merged_df, date >= "2020-03-04")
+
+
+#GGplotting
+
+anim <- ggplot(merged_df, aes(x=date, y= delta_cases)) + 
+  geom_path(aes(color = "New Cases")) + 
+  geom_path(aes(y = delta, color = "S&P500")) + 
+  labs(x = "Date", y = "Percent Change", col = "Symbol", title = "S&P 500 vs COVID-19 New Cases") + 
+  transition_reveal(along = as.numeric(date)) +
+  view_follow()
+
+animate(anim, duration = 30, fps = 30, width = 3000, height = 1000, res = 300, renderer = gifski_renderer(loop = F))
+anim_save("spcovid.gif")
+```
+
