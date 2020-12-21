@@ -27,7 +27,7 @@ chess_rated <- chess %>% filter(rated == "TRUE")
 #All Rated Games---------------------------------
 chess_rated_wins <- chess_rated %>%
 ggplot(aes(x = white_rating, y = black_rating, group = victory_status, col = victory_status)) + 
-  geom_point(alpha = .5) + 
+  geom_point(alpha = .2) + 
   theme_gray() + 
   geom_smooth(aes(group = victory_status), se = FALSE) + 
   labs(title = "Lichess White vs Black Rating (Non-Subsetted)",
@@ -94,5 +94,157 @@ ggsave("black_wins.png",
        plot = black_wins,
        height = 10, width = 15, dpi = 900)
 
+# Exploring Opening Move ----------------------
+chess_rated <- separate(chess_rated, moves, into = "first_move", sep = "\\s")
+
+# King's Pawn Opening -------------------------
+
+kings_pawn_opening <- filter(chess_rated, first_move == "e4")
+
+all_kings_pawn_opening <- kings_pawn_opening %>%
+ggplot(aes(x = white_rating, y = black_rating, group = victory_status, col = victory_status)) + 
+  geom_point(alpha = .2) + 
+  theme_gray() + 
+  geom_smooth(aes(group = victory_status), se = FALSE) + 
+  labs(title = "Lichess White vs Black Rating (Non-Subsetted) (King's Pawn/E4 First Move)",
+       subtitle = "Data: https://www.kaggle.com/datasnaek/chess",
+       col = "Victory Type") + 
+  ylab("Black Rating") + 
+  xlab("White Rating") + 
+  scale_colour_manual(breaks = c("mate", "resign", "draw"),
+                      labels = c("Checkmate", "Resignation", "Draw"),
+                      values = c("#1B9E77",
+                                 "#D95F02",
+                                 "#7570B3"))
+
+kpo_all <- ggMarginal(all_kings_pawn_opening, groupColour = FALSE, groupFill = TRUE)
+
+## KPO White Wins -----------------------------
+kings_pawn_opening_white <- filter(kings_pawn_opening, winner == "white")
+
+chess_kpo_white <- kings_pawn_opening_white %>%
+ggplot(aes(x = white_rating, y = black_rating, group = victory_status, col = victory_status)) + 
+  geom_point(alpha = .2) + 
+  theme_gray() + 
+  geom_smooth(aes(group = victory_status), se = FALSE) + 
+  labs(title = "Lichess White vs Black Rating (White Wins) (King's Pawn/E4 First Move)",
+       subtitle = "Data: https://www.kaggle.com/datasnaek/chess",
+       col = "Victory Type") + 
+  ylab("Black Rating") + 
+  xlab("White Rating") + 
+  scale_colour_manual(breaks = c("mate", "resign"),
+                      labels = c("Checkmate", "Resignation"),
+                      values = c("#1B9E77",
+                                 "#D95F02"))
+
+kpo_white_wins <- ggMarginal(chess_kpo_white, groupColour = FALSE, groupFill = TRUE)
+
+
+## KPO Black Wins ----------------------------------
+kings_pawn_opening_black <- filter(kings_pawn_opening, winner == "black")
+
+chess_kpo_black <- kings_pawn_opening_black %>%
+ggplot(aes(x = white_rating, y = black_rating, group = victory_status, col = victory_status)) + 
+  geom_point(alpha = .2) + 
+  theme_gray() + 
+  geom_smooth(aes(group = victory_status), se = FALSE) + 
+  labs(title = "Lichess White vs Black Rating (Black Wins) (King's Pawn/E4 First Move)",
+       subtitle = "Data: https://www.kaggle.com/datasnaek/chess",
+       col = "Victory Type") + 
+  ylab("Black Rating") + 
+  xlab("White Rating") + 
+  scale_colour_manual(breaks = c("mate", "resign"),
+                      labels = c("Checkmate", "Resignation"),
+                      values = c("#1B9E77",
+                                 "#D95F02"))
+
+kpo_black_wins <- ggMarginal(chess_kpo_black, groupColour = FALSE, groupFill = TRUE)
+
+
+ggsave("kpo_all.png",
+       plot = kpo_all,
+       height = 10, width = 15, dpi = 900)
+
+ggsave("kpo_white_wins.png",
+       plot = kpo_white_wins,
+       height = 10, width = 15, dpi = 900)
+
+ggsave("kpo_black_wins.png",
+       plot = kpo_black_wins,
+       height = 10, width = 15, dpi = 900)
+## Queen's Pawn Opening -------------------------
+
+queens_pawn_opening <- filter(chess_rated, first_move == "d4")
+
+all_queens_pawn_opening <- queens_pawn_opening %>%
+ggplot(aes(x = white_rating, y = black_rating, group = victory_status, col = victory_status)) + 
+  geom_point(alpha = .2) + 
+  theme_gray() + 
+  geom_smooth(aes(group = victory_status), se = FALSE) + 
+  labs(title = "Lichess White vs Black Rating (Non-Subsetted) (Queen's Pawn/D4 First Move)",
+       subtitle = "Data: https://www.kaggle.com/datasnaek/chess",
+       col = "Victory Type") + 
+  ylab("Black Rating") + 
+  xlab("White Rating") + 
+  scale_colour_manual(breaks = c("mate", "resign", "draw"),
+                      labels = c("Checkmate", "Resignation", "Draw"),
+                      values = c("#1B9E77",
+                                 "#D95F02",
+                                 "#7570B3"))
+
+qpo_all <- ggMarginal(all_queens_pawn_opening, groupColour = FALSE, groupFill = TRUE)
+
+## QPO White Wins -----------------------------
+queens_pawn_opening_white <- filter(queens_pawn_opening, winner == "white")
+
+chess_qpo_white <- queens_pawn_opening_white %>%
+ggplot(aes(x = white_rating, y = black_rating, group = victory_status, col = victory_status)) + 
+  geom_point(alpha = .2) + 
+  theme_gray() + 
+  geom_smooth(aes(group = victory_status), se = FALSE) + 
+  labs(title = "Lichess White vs Black Rating (White Wins) (Queen's Pawn/D4 First Move)",
+       subtitle = "Data: https://www.kaggle.com/datasnaek/chess",
+       col = "Victory Type") + 
+  ylab("Black Rating") + 
+  xlab("White Rating") + 
+  scale_colour_manual(breaks = c("mate", "resign"),
+                      labels = c("Checkmate", "Resignation"),
+                      values = c("#1B9E77",
+                                 "#D95F02"))
+
+qpo_white_wins <- ggMarginal(chess_qpo_white, groupColour = FALSE, groupFill = TRUE)
+
+
+## QPO Black Wins ----------------------------------
+queens_pawn_opening_black <- filter(queens_pawn_opening, winner == "black")
+
+chess_qpo_black <- queens_pawn_opening_black %>%
+ggplot(aes(x = white_rating, y = black_rating, group = victory_status, col = victory_status)) + 
+  geom_point(alpha = .2) + 
+  theme_gray() + 
+  geom_smooth(aes(group = victory_status), se = FALSE) + 
+  labs(title = "Lichess White vs Black Rating (Black Wins) (Queen's Pawn/D4 First Move)",
+       subtitle = "Data: https://www.kaggle.com/datasnaek/chess",
+       col = "Victory Type") + 
+  ylab("Black Rating") + 
+  xlab("White Rating") + 
+  scale_colour_manual(breaks = c("mate", "resign"),
+                      labels = c("Checkmate", "Resignation"),
+                      values = c("#1B9E77",
+                                 "#D95F02"))
+
+qpo_black_wins <- ggMarginal(chess_qpo_black, groupColour = FALSE, groupFill = TRUE)
+
+ggsave("qpo_all.png",
+       plot = qpo_all,
+       height = 10, width = 15, dpi = 900)
+
+ggsave("qpo_white_wins.png",
+       plot = qpo_white_wins,
+       height = 10, width = 15, dpi = 900)
+
+ggsave("qpo_black_wins.png",
+       plot = qpo_black_wins,
+       height = 10, width = 15, dpi = 900)
 ```
 
