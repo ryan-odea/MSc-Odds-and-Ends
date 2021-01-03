@@ -1,0 +1,102 @@
+---
+title: "Video-Game-Sales"
+author: "Ryan O'Dea"
+date: "12/24/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+pacman::p_load(
+  tidyverse,
+  ggplot2,
+  gganimate,
+  lubridate,
+  gifski
+)
+```
+
+```{r data-intake}
+vgs <- read.csv("vgsales.csv")
+
+vgs$Platform_Group[vgs$Platform %in% c("Wii",
+                                 "NES",
+                                 "GB",
+                                 "DS",
+                                 "GBA",
+                                 "SNES",
+                                 "3DS",
+                                 "N64",
+                                 "GC",
+                                 "WiiU")] <- "Nintendo Systems"
+
+vgs$Platform_Group[vgs$Platform %in% c("X360",
+                                 "XOne",
+                                 "XB")] <- "Xbox Systems"
+
+vgs$Platform_Group[vgs$Platform %in% c("PS3",
+                                 "PS2",
+                                 "PS4",
+                                 "PS",
+                                 "PSP",
+                                 "PSV")] <- "PlayStation Systems"
+
+vgs$Platform_Group[vgs$Platform %in% c("GEN",
+                                 "SCD",
+                                 "SAT",
+                                 "DC",
+                                 "GG")] <- "Sega Systems"
+
+vgs$Platform_Group[vgs$Platform %in% c("2600")] <- "Atari 2600 System"
+
+vgs$Platform_Group[vgs$Platform %in% c("PC")] <- "Windows PC"
+
+vgs$Platform_Group[vgs$Platform %in% c("WS")] <- "WonderSwan System"
+
+vgs$Platform_Group[vgs$Platform %in% c("NG",
+                                 "TG16",
+                                 "PCFX")] <- "Hudson Soft Systems"
+
+vgs$Platform_Group[vgs$Platform %in% c("3DO")] <- "3DO System"
+
+vgs$Year[vgs$Year %in% c("N/A")] <- NA
+vgs <- vgs[complete.cases(vgs), ]
+
+```
+
+```{r animation-jitter}
+animation_jitter <- vgs %>%
+  ggplot(aes(x = Genre, y = Global_Sales, col = Platform_Group, size = Global_Sales, group = Platform_Group, frame = Year)) +
+  labs(title = "Video Game Global Sales x Genre by Release Platform",
+       subtitle = "Year: {closest_state}",
+       y = "Unit Global Sales (Millions)",
+       col = "Platform") + 
+  guides(size = FALSE) +
+  geom_jitter(alpha = .5) + 
+  scale_color_viridis_d()  + 
+  theme(axis.text.x = element_text(angle = -45, size = 7, hjust = -.1, vjust = .2)) + 
+  transition_states(Year, transition_length = 15, state_length = 3)
+
+
+animate(animation_jitter, duration = 30, fps = 30, width = 3000, height = 2000, res = 300, renderer = gifski_renderer())
+
+anim_save("vgsales_jitter.gif")
+```
+
+```{r animation-col}
+animation_col <- vgs %>%
+  ggplot(aes(x = Genre, y = Global_Sales, fill = Platform_Group)) + 
+  geom_col(position = "dodge") +
+  labs(title = "Video Game Global Sales x Genre by Release Platform",
+       subtitle = "Year: {closest_state}",
+       y = "Unit Global Sales (Millions)",
+       fill = "Platform") + 
+  scale_fill_viridis_d() + 
+  theme(axis.text.x = element_text(angle = -45, size = 7, hjust = -.1, vjust = .2)) + 
+  transition_states(Year, transition_length = 15, state_length = 3)
+
+animate(animation_col, duration = 30, fps = 30, width = 3000, height = 2000, res = 300, renderer = gifski_renderer())
+
+anim_save("vgsales_col.gif")
+```
+
