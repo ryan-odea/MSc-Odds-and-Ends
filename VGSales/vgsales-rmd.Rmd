@@ -75,7 +75,7 @@ animation_jitter <- vgs %>%
   geom_jitter(alpha = .5) + 
   scale_color_viridis_d()  + 
   theme(axis.text.x = element_text(angle = -45, size = 7, hjust = -.1, vjust = .2)) + 
-  transition_states(Year, transition_length = 15, state_length = 3)
+  transition_states(Year, transition_length = 15, state_length = 0)
 
 
 animate(animation_jitter, duration = 30, fps = 30, width = 3000, height = 2000, res = 300, renderer = gifski_renderer())
@@ -99,4 +99,20 @@ animate(animation_col, duration = 30, fps = 30, width = 3000, height = 2000, res
 
 anim_save("vgsales_col.gif")
 ```
+
+```{r}
+facet_col <- vgs %>%
+  ggplot(aes(x = Genre, y = Global_Sales, fill = Platform_Group)) + 
+  geom_col(position = "dodge") +
+  labs(title = "Video Game Global Sales x Genre by Release Platform",
+       subtitle = "Source: https://www.kaggle.com/gregorut/videogamesales",
+       y = "Unit Global Sales (Millions)",
+       fill = "Platform") + 
+  scale_fill_viridis_d() + 
+  facet_wrap(~Year)
+
+facet_col
+ggsave(filename = "facet_col.png", width = 28, height = 28, dpi = 600, units = "in")
+```
+
 
