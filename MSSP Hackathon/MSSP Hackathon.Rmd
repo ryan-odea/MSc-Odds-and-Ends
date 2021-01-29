@@ -1,0 +1,58 @@
+---
+title: "R Notebook"
+output: html_notebook
+author: "Ryan O'Dea"
+---
+```{r setup, include = FALSE}
+library(DBI)
+library(RPostgreSQL)
+library(tidyverse)
+library(rstanarm)
+library(broom)
+```
+
+#Background
+Being able to discern between different tastes is very important in the food industry: it enables the development and refinement of new products. Assessing these differences is a common task in the field of sensory discrimination analysis. Suppose that you know well two food products, A and B, to the point of being able to distinguish them by simply trying both. A harder task is to pass a triangle test: you're given two servings of one product and one serving of the other and you're asked to tell which product was different.
+
+PostgreSQL database practice at host mssp1.bu.edu (BU VPN required!) has a table triangle containing some triangle test results for two popular beverages from a number of evaluators. Your task is to conduct a quick statistical analysis of this dataset and summarize your results in a RMarkdown report.
+
+
+##Warm Up
+Connect to the DB as user mssp using
+
+con <- dbConnect(RPostgreSQL::PostgreSQL(), dbname = "practice", host = "mssp1.bu.edu", user = "mssp")
+
+and craft a query to report the proportion of right guesses for each referee.
+```{r}
+con <- dbConnect(RPostgreSQL::PostgreSQL(), dbname = "practice", host = "mssp1.bu.edu", user = "mssp")
+
+con %>% dbGetQuery("SELECT count(*) FROM triangle") #check
+
+triangle <- tbl(con,"triangle") %>% mutate(y= as.integer(expected == guess))
+triangle %>% group_by(referee) %>% summarise(prop=mean(y))
+
+#A better version
+con %>% dbGetQuery("SELECT referee, AVG(CAST(expected = guess AS int)) AS prop FROM triangle GROUP BY referee")
+
+```
+
+##Task
+Devise a model and fit it to infer if products A and B are distinguishable. In your model, take into account that referees have different taste perception skills.
+
+```{r}
+triangle <- con %>% dbGetQuery("SELECT * FROM triangle")
+dbDisconnect(con)
+
+triangle <- triangle %>% mutate(y = as.integer(expected == guess), referee=factor(referee))
+
+contrasts(triangle$referee) <-contr.sum
+glm(y~referee,family=binomial, data=triangle)
+
+```
+
+
+##Extras
+
+1. Investigate via a model if there's a difference in test outcomes if either product is prevalent (A or B).
+
+2. Investigate via a model if there's a difference in test outcomes if sequence order matters (e.g., AAB vs ABA vs BAA).
