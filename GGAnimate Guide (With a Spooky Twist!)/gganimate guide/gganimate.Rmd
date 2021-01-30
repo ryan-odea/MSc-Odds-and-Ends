@@ -1,0 +1,213 @@
+---
+title: "gganimate guide"
+output: html_document
+---
+# guide from https://goodekat.github.io/presentations/2019-isugg-gganimate-spooky/slides.html#1
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+pacman::p_load(tidyverse,
+              ggplot2,
+              gganimate)
+```
+
+```{r data-intake}
+#bringing in the data and factor-izing the ID
+bats <- read.csv("https://raw.githubusercontent.com/goodekat/presentations/master/2019-isugg-gganimate-spooky/bat-data/bats-subset.csv") %>% mutate(id = factor(id))
+```
+
+```{r introduction}
+#setting up the variables and filtering to ID == 1
+ggplot(bats %>% filter(id == 1),
+       aes(x = longitude,
+           y = latitude, 
+           color = time)) +
+  #addition of a geom
+  geom_point() +
+  #using a color scalar and changing the assigned colors away from violet-white
+  scale_color_gradient2(
+    midpoint = 6,
+    low = "orange",
+    mid = "purple",
+    high = "black"
+  ) + 
+  #adding a gganimate transition between points
+  transition_reveal(time)
+```
+# Transitions 
+
+```{r transition-states}
+bats %>%
+  ggplot(aes(x = longitude,
+             y = latitude,
+             color = time)) + 
+  geom_point() + 
+  scale_color_gradient2(
+    midpoint = 6,
+    low = "orange",
+    mid = "purple",
+    high = "black"
+  ) + 
+  transition_states(states = id)
+#observe the strange manipulation of the lines scene, this is because we failed to add a grouping identifier to the ggplot argument
+
+bats %>%
+  ggplot(aes(x = longitude,
+             y = latitude,
+             color = time,
+             group = id)) + 
+  geom_point() + 
+  scale_color_gradient2(
+    midpoint = 6,
+    low = "orange",
+    mid = "purple",
+    high = "black"
+  ) + 
+  transition_states(states = id,
+                    transition_length = 3,
+                    state_length = 3) + 
+  #we can also change the length of the appearence and add a unique title
+  labs(title = "Bat {previous_state}")
+```
+
+```{r transition-time}
+bats %>%
+  filter(id == 1) %>% 
+  ggplot(aes(x = longitude,
+             y = latitude)) + 
+  geom_point() + 
+  transition_time(time = time)
+#transition time considers a continuous variable whereas transition states considered a factored
+#frames, resolution and length x height can be changed using `animate`
+
+p1 <- bats %>%
+  filter(id == 1) %>% 
+  ggplot(aes(x = longitude,
+             y = latitude)) + 
+  geom_point() + 
+  transition_time(time = time,
+                  #we can also adhust the range of observations with the `range` argument
+                  range = c(1,3))
+
+animate(p1, nframes = 300)
+```
+
+```{r transition-reveal}
+#transition reveal shows data along a diven dimension
+bats %>%
+  filter(id == 1) %>% 
+  ggplot(aes(x = longitude,
+             y = latitude)) + 
+  geom_point() + 
+  transition_reveal(time)
+
+#so what's the difference between `transition_reveal` and `transition_time`?
+#transition reveal calculates intermediary values at exact positions instead of coercing values to the closest frame
+
+#adding geom_path shows the path of the point
+bats %>%
+  filter(id == 1) %>% 
+  ggplot(aes(x = longitude,
+             y = latitude)) + 
+  geom_path() + 
+  geom_point() + 
+  #we can also use argument `along` in transition reveal to keep the points which belond to a group
+  transition_reveal(time)
+```
+
+
+# Views
+```{r view-follow}
+#change the axis to follow the point
+bats %>% filter(id == 3) %>% 
+  ggplot(aes(x = longitude,
+             y = latitude)) + 
+  geom_path() + 
+  transition_reveal(time) + 
+  view_follow()
+```
+
+```{r view-step}
+#follows the data but switches between static and changing to the data range
+bats %>% 
+  filter(id == 3) %>%
+  ggplot(aes(x = longitude,
+             y = latitude)) + 
+  geom_path() + 
+  view_step(pause_length = 3,
+            step_length = 1, 
+            nsteps = 5) + 
+  transition_reveal(time)
+
+#addition to transition_states
+bats %>%
+  ggplot(aes(x = longitude, 
+             y = latitude, 
+             color = time, 
+             group = id)) +
+  geom_point() + 
+  scale_color_gradient2(
+    midpoint = 6, 
+    low = "orange", 
+    mid = "purple",
+    high = "black"
+  ) + 
+  transition_states(states = id) +
+  view_step(pause_length = 3,
+            step_length = 1,
+            nsteps = 5)
+```
+
+# Shadows
+
+```{r shadows-wake}
+bats %>%
+  filter(id == 3) %>%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_point() +
+  transition_reveal(time) +
+  #leaves a 'wake' behind the points, we can adjust size and length
+  shadow_wake(wake_length = 0.1,
+              alpha = 0.5)
+```
+
+```{r shadow-trail}
+#leaving a permanent trail of the points through time
+bats %>%
+  filter(id == 3) %>%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_point() +
+  transition_reveal(time) +
+  shadow_trail(distance = 0.01,
+               #there is another argument for shape = 
+               alpha = 0.5)
+```
+# Entering and Exiting
+
+```{r}
+#of the exits in the guide, ease_aes appears the best option
+bats %>%
+  ggplot(aes(x = longitude,
+             y = latitude,
+             color = time,
+             group = id)) + 
+  geom_point() + 
+  scale_color_gradient2(
+    midpoint = 6,
+    low = "orange",
+    mid = "purple",
+    high = "black"
+  ) + 
+  transition_states(
+    states = id,
+    transition_length = 2,
+    state_length = 1
+  ) + 
+  enter_fade() + 
+  exit_fade() + 
+  ease_aes('sine-in-out')
+```
+
+
