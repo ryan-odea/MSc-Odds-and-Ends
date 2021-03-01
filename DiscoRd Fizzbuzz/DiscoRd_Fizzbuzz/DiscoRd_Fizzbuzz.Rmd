@@ -1,0 +1,44 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+This is a notebook of challenge questions posted into the DiscoRd server
+
+# Reversed Strings
+
+Complete the solution so that it reverses the string passed into it.
+
+Example:
+'world'  =>  'dlrow'
+
+Starter Code
+solution <- function(s){
+  ## your code here
+}
+
+## My Answer
+```{r}
+test <- c("Statistics", "DiscoRd")
+
+reverse.string <- function(x) {
+  sapply(lapply(strsplit(x, NULL), rev), paste, collapse = "")
+}
+
+reverse.string(test)
+```
+
+# 3-7-3/7 
+Calculate how many numbers between 1:1000 are divisible by 3, how many are not divisible by 7, and how many are divisible by both 3 and 7.
+
+## Answer by Zyke
+```{r}
+library(tidyverse)
+
+summarise(tibble(v = 1:1000),
+  three            = sum(v %% 3 == 0),
+  not_seven        = sum(v %% 7 != 0),
+  three_and_seven  = sum(v %% 3 == 0 & v %% 7 == 0),
+  three_nand_seven = sum(v %% 3 == 0 & v %% 7 != 0)
+)
+```
+

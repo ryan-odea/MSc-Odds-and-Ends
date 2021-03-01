@@ -13,7 +13,10 @@ pacman::p_load(
   tidyverse,
   lubridate,
   ggExtra,
-  wesanderson
+  wesanderson,
+  rchess,
+  furrr,
+  reshape2
 )
 ```
 
@@ -246,5 +249,55 @@ ggsave("qpo_white_wins.png",
 ggsave("qpo_black_wins.png",
        plot = qpo_black_wins,
        height = 10, width = 15, dpi = 900)
+```
+
+
+# Applying and Studying Kunst's Visualization Method
+## https://jkunst.com/blog/posts/2015-10-30-visualizing-chess-data-with-ggplot/
+
+```{r}
+data("chesswc")
+
+chessdf <- chess %>%
+  mutate(game_id = row_number())
+
+chessdf$moves %<>% str_match_all("\\S+\\s\\S+") %>%
+  map(~paste0(seq_along(.x), ". ", .x, sep = "")) %>% 
+  map(paste0, sep = " ", collapse = "") %>% unlist(recursive = FALSE)
+
+chess_tib <- as_tibble(chessdf)
+
+chss <- Chess$new()
+
+plan(multisession)
+
+dfmoves <- chess_tib %>% 
+  mutate(
+    data = future_map(moves, function(p) {
+      chss <- Chess$new()
+      chss$load_pgn(p)
+      chss$history_detail()
+    })
+  ) %>% select(-moves) %>% 
+  unnest()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```
 
