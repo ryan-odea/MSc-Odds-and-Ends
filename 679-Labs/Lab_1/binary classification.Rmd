@@ -1,0 +1,44 @@
+---
+title: "Binary Classification"
+author: "Yuning Pan"
+date: "1/26/2021"
+output: html_document
+---
+
+```{r}
+#generate 100 blue dots and 100 red dots, but pretend that we don't know how they are generated. Our goal is to draw a decision boundary.
+library(MASS)
+m1 = c(1,-1)
+m2 = c(-1,0.5)
+s = matrix(c(1,0,0,2),nrow = 2)
+set.seed(2021)
+blue = mvrnorm(n=100,mu=m1,Sigma = s)
+red = mvrnorm(n=100,mu=m2,Sigma = s)
+
+plot(blue,main = "Binary Classification", xlab="X1", ylab="X2",pch=20,col="blue",ylim = c(-4,4),xlim = c(-4,4));points(red,pch=20,col="red")
+```
+
+
+do the linear regression, $$y_i = x_{i1}\beta_1 + x_{i2}\beta_2 + \beta_3$$
+```{r}
+#put it in a binary form blue=1, red=0
+blue=cbind(blue,rep(1,100))
+red=cbind(red,rep(0,100))
+mix = rbind(blue,red)
+model = lm(V3 ~ V1+V2,data = as.data.frame(mix))
+```
+
+
+the decision boundary should be $$x_1\hat{\beta_1} + $x_2\hat{\beta_2} + \hat{\beta_3} = 0.5$$
+```{r}
+c = model$coefficients
+x = seq(-4,4,length=200)
+plot(blue,main = "Binary Classification", xlab="X1", ylab="X2",pch=20,col="blue",ylim = c(-4,4),xlim = c(-4,4));points(red,pch=20,col="red");lines(x,(0.5-c[1]-c[2]*x)/c[3])
+```
+
+
+Compute the accuracy of this decision boundary
+```{r}
+mix=cbind(mix,fitted.values(model)>0.5)
+sum(mix[,3]==mix[,4])/200 ##accuracy of the decision boundary
+```

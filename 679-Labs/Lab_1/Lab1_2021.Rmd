@@ -1,0 +1,186 @@
+---
+title: "Lab1: Setting up H2O"
+author: "Your name"
+date: "1/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction to H2O
+### setting up H2O
+
+H2O is fast, scalable, open-source machine learning and deep learning platform.  It uses in-memory compression, allowing you to handle billions of data rows in-memory, even with a small cluster. H2O includes many common machine learning algorithms, such as generalized linear modeling (linear regression, logistic regression, etc.), Naive Bayes, principal components analysis, time series, k-means clustering, and others. H2O also implements best-in-class algorithms at scale, such as Random Forest, Gradient Boosting and Deep Learning. 
+
+We will make use of H2O in the later portion of the class.  Please follow the instruction and install H2O on your computer.
+https://github.com/h2oai/h2o-3/tree/master/h2o-r
+
+Install JDK13:
+https://www.oracle.com/java/technologies/javase-jdk13-downloads.html
+
+Uninstall Java on Mac:
+https://explainjava.com/uninstall-java-macos/
+
+Change default Java version:
+https://stackoverflow.com/questions/21964709/how-to-set-or-change-the-default-java-jdk-version-on-os-x#:~:text=Four%20easy%20steps%20using%20terminal,uses%20the%20default%20process..%20%3A)&text=export%20JAVA_HOME%3D'%2FLibrary%2FJava,will%20change%20the%20java%20home..
+
+
+```{r}
+#if ("package:h2o" %in% search()) { detach("package:h2o", unload=TRUE) }
+#if ("h2o" %in% rownames(installed.packages())) { remove.packages("h2o") }
+###uninstall the previous version of h20
+
+###pkgs <- c("RCurl","jsonlite")
+###for (pkg in pkgs) {
+###  if (! (pkg %in% rownames(installed.packages()))) { install.packages(pkg) }
+###}
+###install packages that h20 depends on
+
+
+###install.packages("h2o", type="source", repos=(c("http://h2o-release.s3.amazonaws.com/h2o/latest_stable_R")))
+###
+
+library(h2o)
+```
+### Starting H2O
+
+```{r}
+# nthreads specifies number of threads. -1 means use all the CPU cores.
+# max_mem_size specifies the maximum amount of RAM to use.
+localH2O <- h2o.init(nthreads = -1, max_mem_size="4g")
+```
+
+You can access H2O instance using the web UI FLOW by typing 
+ http://localhost:54321
+ in your browser.
+
+### Fitting GLM using H2O
+
+We will follow the Vignette to see what H2O can do.
+
+https://h2o-release.s3.amazonaws.com/h2o/rel-slater/9/docs-website/h2o-docs/booklets/GLM_Vignette.pdf
+
+More details of the H2O glm can be found here:
+http://h2o-release.s3.amazonaws.com/h2o/rel-nunes/2/docs-website/datascience/glm.html
+
+### GLM Models with H2O
+
+By default H2O uses regularization called the elastic net.  Elastic net is a mix of ridge regression and lasso.
+
+We will come back to this point in the second week but for now, let's not worry about this aspect and set the tuning parameter to $\lambda$ to 0 which is just a standard OLS.
+
+We will use Prostate Cancer Study data as an example.  First you need to upload the data onto H2O by specifying the path.
+
+```{r}
+path = system.file("extdata", "prostate.csv", package = "h2o")
+h2o_df = h2o.importFile(path)
+```
+
+Fitting GLM
+```{r h2o_fit_glm}
+gaussian.fit = h2o.glm(y = "VOL", 
+                       x = c("AGE", "RACE", "PSA", "GLEASON"),
+                      training_frame = h2o_df, 
+                      family = "gaussian",lambda = 0)
+gaussian.fit
+```
+
+Saving and loading the model
+```{r}
+# save the model
+model_path <- h2o.saveModel(object=gaussian.fit, path=getwd(), force=TRUE)
+print(model_path)
+
+# load the model
+saved_model <- h2o.loadModel(model_path)
+```
+
+
+We can get the same result using R as you are all familiar with.
+
+```{r}
+# same thing using R
+data<-read.csv(path)
+glm.fit<-glm(VOL~AGE+RACE+PSA+GLEASON,data=data,family = "gaussian")
+summary(glm.fit)
+```
+
+Note that SE is not given as default in H2O
+
+
+### Cross validation
+
+You can use K fold cross validation by specifying an integer to nfolds option.  With cross-validated model building, H2O builds K+1 models: K cross-validated model and 1 overarching model over all of the training data.  
+
+Fitting GLM using 10 fold cross validation.
+
+```{r}
+gaussian.fit.cv = h2o.glm(y = "VOL", 
+                          x = c("AGE", "RACE", "PSA", "GLEASON"),
+                          training_frame = h2o_df, family = "gaussian",lambda = 0, nfolds = 10)
+gaussian.fit.cv
+```
+
+The plot shows the variability of each fold.  The red x is the final estimate. 
+```{r}
+boxplot(t(sapply(sapply(gaussian.fit.cv@model$cross_validation_models, `[[`, "name"), function(x) h2o.coef(h2o.getModel(x)))),
+        names = NULL)
+points(1:5, coef(gaussian.fit.cv@model), pch = "X", col = "red")
+abline(h = 0, col = "blue")
+
+```
+
+### Prediction using H2O
+
+The main purpose of H2O is prediction.  Let's look at the prostate cancer example.
+
+```{r}
+path   = system.file("extdata", "prostate.csv", package = "h2o")
+h2o_df = h2o.importFile(path)
+h2o_df$CAPSULE = as.factor(h2o_df$CAPSULE)
+rand_vec <- h2o.runif(h2o_df, seed = 1234)
+train    <- h2o_df[rand_vec <= 0.8,]
+valid    <- h2o_df[(rand_vec > 0.8) & (rand_vec <= 0.9),]
+test     <- h2o_df[rand_vec > 0.9,]
+binomial.fit = h2o.glm(y = "CAPSULE",
+                       x = c("AGE", "RACE", "PSA", "GLEASON"),
+                       training_frame = train, 
+                       validation_frame = valid, 
+                       family = "binomial")
+```
+
+### Make and export predictions.
+```{r}
+pred = h2o.predict(binomial.fit, test)
+h2o.exportFile(pred, "/tmp/pred.csv", force = TRUE)
+```
+
+## Model Performance Metrics in H2O
+```{r}
+perf = h2o.performance(binomial.fit, test)
+print(perf)
+```
+
+Other statistics
+```{r}
+h2o.mse(binomial.fit, train = TRUE, valid = TRUE)
+h2o.r2(binomial.fit, train = TRUE, valid = TRUE)
+h2o.logloss(binomial.fit, train = TRUE, valid = TRUE)
+h2o.auc(binomial.fit, train = TRUE, valid = TRUE)
+h2o.giniCoef(binomial.fit, train = TRUE, valid = TRUE)
+h2o.null_deviance(binomial.fit, train = TRUE, valid = TRUE)
+h2o.residual_deviance(binomial.fit, train = TRUE, valid = TRUE)
+h2o.aic(binomial.fit, train = TRUE, valid = TRUE)
+```
+
+### Shut down H2O
+
+```{r h2o_shutdown,exercise=TRUE,eval=FALSE}
+h2o.shutdown(prompt =F)
+```
+
+```{r}
+sessionInfo()
+```
