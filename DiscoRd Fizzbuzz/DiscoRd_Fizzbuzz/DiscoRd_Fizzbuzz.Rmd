@@ -16,7 +16,6 @@ solution <- function(s){
   ## your code here
 }
 
-## My Answer
 ```{r}
 test <- c("Statistics", "DiscoRd")
 
@@ -30,7 +29,6 @@ reverse.string(test)
 # 3-7-3/7 
 Calculate how many numbers between 1:1000 are divisible by 3, how many are not divisible by 7, and how many are divisible by both 3 and 7.
 
-## Answer by Zyke
 ```{r}
 library(tidyverse)
 
@@ -40,5 +38,16 @@ summarise(tibble(v = 1:1000),
   three_and_seven  = sum(v %% 3 == 0 & v %% 7 == 0),
   three_nand_seven = sum(v %% 3 == 0 & v %% 7 != 0)
 )
+```
+
+# Create an R function to test if a number is a perfect root
+
+```{r}
+PerfectRootCheck <- function(input){
+  n <- as.integer(input)
+  root <- sqrt(n)
+  response <- ifelse(as.integer(root + .5)**2 == n, "is a perfect square", "is not a perfect square")
+  return(paste(n, response))
+}
 ```
 

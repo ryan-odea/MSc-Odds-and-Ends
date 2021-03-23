@@ -1755,8 +1755,6 @@ summary {
 <p>Complete the solution so that it reverses the string passed into it.</p>
 <p>Example: ‘world’ =&gt; ‘dlrow’</p>
 <p>Starter Code solution &lt;- function(s){ ## your code here }</p>
-<div id="my-answer" class="section level2">
-<h2>My Answer</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdCA8LSBjKFwiU3RhdGlzdGljc1wiLCBcIkRpc2NvUmRcIilcblxucmV2ZXJzZS5zdHJpbmcgPC0gZnVuY3Rpb24oeCkge1xuICBzYXBwbHkobGFwcGx5KHN0cnNwbGl0KHgsIE5VTEwpLCByZXYpLCBwYXN0ZSwgY29sbGFwc2UgPSBcIlwiKVxufVxuXG5yZXZlcnNlLnN0cmluZyh0ZXN0KVxuYGBgIn0= -->
@@ -1768,34 +1766,45 @@ reverse.string &lt;- function(x) {
 
 reverse.string(test)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwic2NpdHNpdGF0U1wiIFwiZFJvY3NpRFwiICAgXG4ifQ== -->
-<pre><code>[1] &quot;scitsitatS&quot; &quot;dRocsiD&quot;   </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-</div>
 </div>
 <div id="section" class="section level1">
 <h1>3-7-3/7</h1>
 <p>Calculate how many numbers between 1:1000 are divisible by 3, how many are not divisible by 7, and how many are divisible by both 3 and 7.</p>
-<div id="answer-by-zyke" class="section level2">
-<h2>Answer by Zyke</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6NH0sInJkZiI6Ikg0c0lBQUFBQUFBQUJsMlEzVTZETUJUSEQ0WE9RS0tTZU84YmpHVVluMEJ2VFl4WGl6ZExCOVdSNGVsU092WFNKOTg4N2RyQVNnTDh6Kzk4bjdmbjFVT3hLZ0FnaFF3WXBKd2t6SjVlbC9WakRaQXhzaEx5NVBiL1MxRjNKREo2cjUwRGtwZFJwKytqaHNVazVqNHF4RkY4eVlGRTZZcDVhTFphU20va3FNeDZrTjhTUGJoMTNyWEE5Z0tYWjR3anYreVVhL1ZUaFc1MkhQWkhueE05OFVoTkw0WXdVb0JGSzR5b1BqVGxrM1dNVXE3VTNuUUtLWW5aby9Bb09kRVJLQTlvSjJubnpmYUF1L215dGgzOHRXQnl1V1NpczNOUGR2SzF1Szgxay9qWlliZ1c3OFZHOXQ2NG9aWGR4dFZlZDJqQ0trU0h5aWdqUWx6UnFENFF0eHdjL3dFMU5ud0lEUUlBQUE9PSJ9 -->
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["three"],"name":[1],"type":["int"],"align":["right"]},{"label":["not_seven"],"name":[2],"type":["int"],"align":["right"]},{"label":["three_and_seven"],"name":[3],"type":["int"],"align":["right"]},{"label":["three_nand_seven"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"333","2":"858","3":"47","4":"286"}],"options":{"columns":{"min":{},"max":[10],"total":[4]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
-  </script>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5cbnN1bW1hcmlzZSh0aWJibGUodiA9IDE6MTAwMCksXG4gIHRocmVlICAgICAgICAgICAgPSBzdW0odiAlJSAzID09IDApLFxuICBub3Rfc2V2ZW4gICAgICAgID0gc3VtKHYgJSUgNyAhPSAwKSxcbiAgdGhyZWVfYW5kX3NldmVuICA9IHN1bSh2ICUlIDMgPT0gMCAmIHYgJSUgNyA9PSAwKSxcbiAgdGhyZWVfbmFuZF9zZXZlbiA9IHN1bSh2ICUlIDMgPT0gMCAmIHYgJSUgNyAhPSAwKVxuKVxuYGBgIn0= -->
+<pre class="r"><code>library(tidyverse)
+
+summarise(tibble(v = 1:1000),
+  three            = sum(v %% 3 == 0),
+  not_seven        = sum(v %% 7 != 0),
+  three_and_seven  = sum(v %% 3 == 0 &amp; v %% 7 == 0),
+  three_nand_seven = sum(v %% 3 == 0 &amp; v %% 7 != 0)
+)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 </div>
-<!-- rnb-frame-end -->
+<div id="create-an-r-function-to-test-if-a-number-is-a-perfect-root" class="section level1">
+<h1>Create an R function to test if a number is a perfect root</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuUGVyZmVjdFJvb3RDaGVjayA8LSBmdW5jdGlvbihpbnB1dCl7XG4gIG4gPC0gYXMuaW50ZWdlcihpbnB1dClcbiAgcm9vdCA8LSBzcXJ0KG4pXG4gIHJlc3BvbnNlIDwtIGlmZWxzZShhcy5pbnRlZ2VyKHJvb3QgKyAuNSkqKjIgPT0gbiwgXCJpcyBhIHBlcmZlY3Qgc3F1YXJlXCIsIFwiaXMgbm90IGEgcGVyZmVjdCBzcXVhcmVcIilcbiAgcmV0dXJuKHBhc3RlKG4sIHJlc3BvbnNlKSlcbn1cbmBgYCJ9 -->
+<pre class="r"><code>PerfectRootCheck &lt;- function(input){
+  n &lt;- as.integer(input)
+  root &lt;- sqrt(n)
+  response &lt;- ifelse(as.integer(root + .5)**2 == n, &quot;is a perfect square&quot;, &quot;is not a perfect square&quot;)
+  return(paste(n, response))
+}</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
-</div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KVGhpcyBpcyBhIG5vdGVib29rIG9mIGNoYWxsZW5nZSBxdWVzdGlvbnMgcG9zdGVkIGludG8gdGhlIERpc2NvUmQgc2VydmVyDQoNCiMgUmV2ZXJzZWQgU3RyaW5ncw0KDQpDb21wbGV0ZSB0aGUgc29sdXRpb24gc28gdGhhdCBpdCByZXZlcnNlcyB0aGUgc3RyaW5nIHBhc3NlZCBpbnRvIGl0Lg0KDQpFeGFtcGxlOg0KJ3dvcmxkJyAgPT4gICdkbHJvdycNCg0KU3RhcnRlciBDb2RlDQpzb2x1dGlvbiA8LSBmdW5jdGlvbihzKXsNCiAgIyMgeW91ciBjb2RlIGhlcmUNCn0NCg0KIyMgTXkgQW5zd2VyDQpgYGB7cn0NCnRlc3QgPC0gYygiU3RhdGlzdGljcyIsICJEaXNjb1JkIikNCg0KcmV2ZXJzZS5zdHJpbmcgPC0gZnVuY3Rpb24oeCkgew0KICBzYXBwbHkobGFwcGx5KHN0cnNwbGl0KHgsIE5VTEwpLCByZXYpLCBwYXN0ZSwgY29sbGFwc2UgPSAiIikNCn0NCg0KcmV2ZXJzZS5zdHJpbmcodGVzdCkNCmBgYA0KDQojIDMtNy0zLzcgDQpDYWxjdWxhdGUgaG93IG1hbnkgbnVtYmVycyBiZXR3ZWVuIDE6MTAwMCBhcmUgZGl2aXNpYmxlIGJ5IDMsIGhvdyBtYW55IGFyZSBub3QgZGl2aXNpYmxlIGJ5IDcsIGFuZCBob3cgbWFueSBhcmUgZGl2aXNpYmxlIGJ5IGJvdGggMyBhbmQgNy4NCg0KIyMgQW5zd2VyIGJ5IFp5a2UNCmBgYHtyfQ0KbGlicmFyeSh0aWR5dmVyc2UpDQoNCnN1bW1hcmlzZSh0aWJibGUodiA9IDE6MTAwMCksDQogIHRocmVlICAgICAgICAgICAgPSBzdW0odiAlJSAzID09IDApLA0KICBub3Rfc2V2ZW4gICAgICAgID0gc3VtKHYgJSUgNyAhPSAwKSwNCiAgdGhyZWVfYW5kX3NldmVuICA9IHN1bSh2ICUlIDMgPT0gMCAmIHYgJSUgNyA9PSAwKSwNCiAgdGhyZWVfbmFuZF9zZXZlbiA9IHN1bSh2ICUlIDMgPT0gMCAmIHYgJSUgNyAhPSAwKQ0KKQ0KYGBgDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KVGhpcyBpcyBhIG5vdGVib29rIG9mIGNoYWxsZW5nZSBxdWVzdGlvbnMgcG9zdGVkIGludG8gdGhlIERpc2NvUmQgc2VydmVyDQoNCiMgUmV2ZXJzZWQgU3RyaW5ncw0KDQpDb21wbGV0ZSB0aGUgc29sdXRpb24gc28gdGhhdCBpdCByZXZlcnNlcyB0aGUgc3RyaW5nIHBhc3NlZCBpbnRvIGl0Lg0KDQpFeGFtcGxlOg0KJ3dvcmxkJyAgPT4gICdkbHJvdycNCg0KU3RhcnRlciBDb2RlDQpzb2x1dGlvbiA8LSBmdW5jdGlvbihzKXsNCiAgIyMgeW91ciBjb2RlIGhlcmUNCn0NCg0KYGBge3J9DQp0ZXN0IDwtIGMoIlN0YXRpc3RpY3MiLCAiRGlzY29SZCIpDQoNCnJldmVyc2Uuc3RyaW5nIDwtIGZ1bmN0aW9uKHgpIHsNCiAgc2FwcGx5KGxhcHBseShzdHJzcGxpdCh4LCBOVUxMKSwgcmV2KSwgcGFzdGUsIGNvbGxhcHNlID0gIiIpDQp9DQoNCnJldmVyc2Uuc3RyaW5nKHRlc3QpDQpgYGANCg0KIyAzLTctMy83IA0KQ2FsY3VsYXRlIGhvdyBtYW55IG51bWJlcnMgYmV0d2VlbiAxOjEwMDAgYXJlIGRpdmlzaWJsZSBieSAzLCBob3cgbWFueSBhcmUgbm90IGRpdmlzaWJsZSBieSA3LCBhbmQgaG93IG1hbnkgYXJlIGRpdmlzaWJsZSBieSBib3RoIDMgYW5kIDcuDQoNCmBgYHtyfQ0KbGlicmFyeSh0aWR5dmVyc2UpDQoNCnN1bW1hcmlzZSh0aWJibGUodiA9IDE6MTAwMCksDQogIHRocmVlICAgICAgICAgICAgPSBzdW0odiAlJSAzID09IDApLA0KICBub3Rfc2V2ZW4gICAgICAgID0gc3VtKHYgJSUgNyAhPSAwKSwNCiAgdGhyZWVfYW5kX3NldmVuICA9IHN1bSh2ICUlIDMgPT0gMCAmIHYgJSUgNyA9PSAwKSwNCiAgdGhyZWVfbmFuZF9zZXZlbiA9IHN1bSh2ICUlIDMgPT0gMCAmIHYgJSUgNyAhPSAwKQ0KKQ0KYGBgDQoNCiMgQ3JlYXRlIGFuIFIgZnVuY3Rpb24gdG8gdGVzdCBpZiBhIG51bWJlciBpcyBhIHBlcmZlY3Qgcm9vdA0KDQpgYGB7cn0NClBlcmZlY3RSb290Q2hlY2sgPC0gZnVuY3Rpb24oaW5wdXQpew0KICBuIDwtIGFzLmludGVnZXIoaW5wdXQpDQogIHJvb3QgPC0gc3FydChuKQ0KICByZXNwb25zZSA8LSBpZmVsc2UoYXMuaW50ZWdlcihyb290ICsgLjUpKioyID09IG4sICJpcyBhIHBlcmZlY3Qgc3F1YXJlIiwgImlzIG5vdCBhIHBlcmZlY3Qgc3F1YXJlIikNCiAgcmV0dXJuKHBhc3RlKG4sIHJlc3BvbnNlKSkNCn0NCmBgYA0KDQo=</div>
 
 
 
