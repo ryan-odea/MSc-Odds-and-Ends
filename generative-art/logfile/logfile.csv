@@ -1,0 +1,17 @@
+file_name	seed	formula_x	formula_y
+NA	NA	NA	NA
+2021-04-14-22-27_seed_5278.png	5278	rnorm(1, -4, 1) * x_i^8 - sin(y_i^3)	runif(1, -3, 1) * y_i^2 - cos(x_i^4)
+2021-04-14-22-27_seed_1419.png	1419	rnorm(1, -4, 1) * x_i^8 - sin(y_i^3)	runif(1, -3, 1) * y_i^2 - cos(x_i^4)
+2021-04-14-22-28_seed_2788.png	2788	rnorm(1, -4, 1) * x_i^8 - sin(y_i^3)	runif(1, -3, 1) * y_i^2 - cos(x_i^4)
+2021-04-14-22-28_seed_1223.png	1223	rnorm(1, -4, 1) * x_i^8 - sin(y_i^3)	runif(1, -3, 1) * y_i^2 - cos(x_i^4)
+2021-04-14-22-28_seed_7954.png	7954	rnorm(1, -4, 1) * x_i^8 - sin(y_i^3)	runif(1, -3, 1) * y_i^2 - cos(x_i^4)
+2021-04-14-22-31_seed_2703.png	2703	rnorm(1, -1, 1) * x_i^2 - sin(y_i^2)	3 - (runif(1, -1, 1) * y_i^3 - cos(x_i^2))
+2021-04-14-22-31_seed_1831.png	1831	rnorm(1, -1, 1) * x_i^2 - sin(y_i^2)	3 - (runif(1, -1, 1) * y_i^3 - cos(x_i^2))
+2021-04-14-22-32_seed_2765.png	2765	rnorm(1, -1, 1) * x_i^2 - sin(y_i^2)	3 - (runif(1, -1, 1) * y_i^3 - cos(x_i^2))
+2021-04-14-22-32_seed_7524.png	7524	rnorm(1, -1, 1) * x_i^2 - sin(y_i^2)	3 - (runif(1, -1, 1) * y_i^3 - cos(x_i^2))
+2021-04-14-22-33_seed_7381.png	7381	rnorm(1, -1, 1) * x_i^2 - sin(y_i^2)	3 - (runif(1, -1, 1) * y_i^3 - cos(x_i^2))
+2021-04-14-22-37_seed_9513.png	9513	rnorm(1, -1, 1) * x_i^2 - sin(y_i^2) * sin(3 * y_i^2)	3 - (runif(1, -1, 1) * y_i^3 - cos(x_i^2))
+2021-04-14-22-37_seed_2083.png	2083	rnorm(1, -1, 1) * x_i^2 - sin(y_i^2) * sin(3 * y_i^2)	3 - (runif(1, -1, 1) * y_i^3 - cos(x_i^2))
+2021-04-14-22-38_seed_5511.png	5511	rnorm(1, -1, 1) * x_i^2 - sin(y_i^2) * sin(3 * y_i^2)	3 - (runif(1, -1, 1) * y_i^3 - cos(x_i^2))
+2021-04-14-22-38_seed_9475.png	9475	rnorm(1, -1, 1) * x_i^2 - sin(y_i^2) * sin(3 * y_i^2)	3 - (runif(1, -1, 1) * y_i^3 - cos(x_i^2))
+2021-04-14-22-39_seed_7039.png	7039	rnorm(1, -1, 1) * x_i^2 - sin(y_i^2) * sin(3 * y_i^2)	3 - (runif(1, -1, 1) * y_i^3 - cos(x_i^2))
