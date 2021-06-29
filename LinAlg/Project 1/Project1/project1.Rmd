@@ -1,0 +1,170 @@
+---
+title: "Project 1"
+author: "Ryan O'Dea"
+date: "5/7/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(expm)
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(results = "asis")
+
+write_matex <- function(x) {
+  begin <- "$$\\begin{bmatrix}"
+  end <- "\\end{bmatrix}$$"
+  X <-
+    apply(x, 1, function(x) {
+      paste(
+        paste(x, collapse = "&"),
+        "\\\\"
+      )
+    })
+  writeLines(c(begin, X, end))
+}
+
+```
+
+We let T, our transition matrix be equal to
+
+```{r, echo = FALSE, results="asis"}
+transition_matrix <- t(matrix(data = c(0, 0, 35, 25, 10, 5, 0, 0,
+                         .03, 0, 0, 0, 0, 0, 0, 0, 
+                         0, .6, 0, 0, 0, 0, 0, 0,
+                         0, 0, .6, 0, 0, 0, 0, 0,
+                         0, 0, 0, .5, 0, 0, 0, 0,
+                         0, 0, 0, 0, .4, 0, 0, 0,
+                         0, 0, 0, 0, 0, .3, 0, 0,
+                         0, 0, 0, 0, 0, 0, .2, 0), ncol = 8))
+write_matex(transition_matrix)
+```
+
+And we let the column vector of our fish population at time $v_0$ = 
+
+```{r}
+fish_vector <- as.matrix(c(50000, 0, 0, 0, 0, 0, 0, 0), ncol = 1)
+write_matex(fish_vector)
+```
+
+By the given definition, $v_1 = Tv_0$ and subsequently $v_2 = Tv_1 \dots v_i = Tv_{i-1}$. By updating the vectors through matrix multiplication we eventually arrive at vectors (written in a singular matrix as to preserve space, where $col_1 = v_0, col_2 = v_1$ and so on.)
+
+```{r}
+V0 <- as.matrix(c(50000, 0, 0, 0, 0, 0, 0, 0))
+V1 <- transition_matrix%*%V0
+V2 <- transition_matrix%*%V1
+V3 <- transition_matrix%*%V2
+V4 <- transition_matrix%*%V3
+V5 <- transition_matrix%*%V4
+V6 <- transition_matrix%*%V5
+V7 <- transition_matrix%*%V6
+V8 <- transition_matrix%*%V7
+
+total_matrix <- cbind(V0, V1, V2, V3, V4, V5, V6, V7, V8)
+write_matex(total_matrix)
+```
+Relating back to our original matrix, T, we observe that the numbers along the diagonal are how many original fish remain over the 8 year period. For instance, the $T_{5,4} = 0.5$ would indicate that only 50% of the original fish survived from the previous year. The pattern would be similar for all diagonal numbers. The integers across $T_{1,3:6}$ would indicate the rate at which fish are breeding and thus producing new fish. \newline
+As a definition for the general term ($T_{ij}$) would show the age of the fish present in the lake at a given time. Relating back to $T_{,4} = v_3$ we would have 540 three year old fish and 31,500 one year old fish. \newline
+Looking into the future, we can observe the $v_2 = Tv_1 = T^2v_0$ so it would follow that $v_{40} = T^{40}v_0$ \newline
+Below we have the vectors (once again bound into a matrix to preserve space) for $col_1 = v_0, col_2 = v_{40}, col_3 = v_{50}, col_4 = v_{100}, col_5 = v_{250}$
+
+```{r}
+V40 <- (transition_matrix%^%40)%*%fish_vector
+V50 <- (transition_matrix%^%50)%*%fish_vector
+V100 <- (transition_matrix%^%100)%*%fish_vector
+V250 <- (transition_matrix%^%250)%*%fish_vector
+
+total_future <- cbind(V0, V40, V50, V100, V250)
+write_matex(round(total_future))
+```
+To simulate how small changes in entries in T effects prediction, we rerun the simulation and add +2.5% to the nonzero element in row three yielding:
+```{r}
+sim1 <- t(matrix(data = c(0, 0, 35, 25, 10, 5, 0, 0,
+                         .03, 0, 0, 0, 0, 0, 0, 0, 
+                         0, .625, 0, 0, 0, 0, 0, 0,
+                         0, 0, .6, 0, 0, 0, 0, 0,
+                         0, 0, 0, .5, 0, 0, 0, 0,
+                         0, 0, 0, 0, .4, 0, 0, 0,
+                         0, 0, 0, 0, 0, .3, 0, 0,
+                         0, 0, 0, 0, 0, 0, .2, 0), ncol = 8))
+
+write_matex(sim1)
+
+V40 <- (sim1%^%40)%*%fish_vector
+V50 <- (sim1%^%50)%*%fish_vector
+V100 <- (sim1%^%100)%*%fish_vector
+V250 <- (sim1%^%250)%*%fish_vector
+
+total_future <- cbind(V0, V40, V50, V100, V250)
+write_matex(round(total_future))
+```
+Let's do the same by subtracting 4% from the nonzero element in row seven yielding: 
+
+```{r}
+sim2 <- t(matrix(data = c(0, 0, 35, 25, 10, 5, 0, 0,
+                         .03, 0, 0, 0, 0, 0, 0, 0, 
+                         0, .6, 0, 0, 0, 0, 0, 0,
+                         0, 0, .6, 0, 0, 0, 0, 0,
+                         0, 0, 0, .5, 0, 0, 0, 0,
+                         0, 0, 0, 0, .4, 0, 0, 0,
+                         0, 0, 0, 0, 0, .26, 0, 0,
+                         0, 0, 0, 0, 0, 0, .2, 0), ncol = 8))
+
+write_matex(sim2)
+
+V40 <- (sim2%^%40)%*%fish_vector
+V50 <- (sim2%^%50)%*%fish_vector
+V100 <- (sim2%^%100)%*%fish_vector
+V250 <- (sim2%^%250)%*%fish_vector
+
+total_future <- cbind(V0, V40, V50, V100, V250)
+write_matex(round(total_future))
+```
+Repeat by changing the nonzero element in row 2 with +4%
+```{r}
+sim3 <- t(matrix(data = c(0, 0, 35, 25, 10, 5, 0, 0,
+                         .07, 0, 0, 0, 0, 0, 0, 0, 
+                         0, .6, 0, 0, 0, 0, 0, 0,
+                         0, 0, .6, 0, 0, 0, 0, 0,
+                         0, 0, 0, .5, 0, 0, 0, 0,
+                         0, 0, 0, 0, .4, 0, 0, 0,
+                         0, 0, 0, 0, 0, .3, 0, 0,
+                         0, 0, 0, 0, 0, 0, .2, 0), ncol = 8))
+
+write_matex(sim3)
+
+V40 <- (sim3%^%40)%*%fish_vector
+V50 <- (sim3%^%50)%*%fish_vector
+V100 <- (sim3%^%100)%*%fish_vector
+V250 <- (sim3%^%250)%*%fish_vector
+
+total_future <- cbind(V0, V40, V50, V100, V250)
+write_matex(round(total_future))
+```
+
+Now let's combine all of these changes and observe the results:
+
+```{r}
+sim4 <- t(matrix(data = c(0, 0, 35, 25, 10, 5, 0, 0,
+                         .07, 0, 0, 0, 0, 0, 0, 0, 
+                         0, .625, 0, 0, 0, 0, 0, 0,
+                         0, 0, .6, 0, 0, 0, 0, 0,
+                         0, 0, 0, .5, 0, 0, 0, 0,
+                         0, 0, 0, 0, .4, 0, 0, 0,
+                         0, 0, 0, 0, 0, .26, 0, 0,
+                         0, 0, 0, 0, 0, 0, .2, 0), ncol = 8))
+
+write_matex(sim4)
+
+V40 <- (sim4%^%40)%*%fish_vector
+V50 <- (sim4%^%50)%*%fish_vector
+V100 <- (sim4%^%100)%*%fish_vector
+V250 <- (sim4%^%250)%*%fish_vector
+
+total_future <- cbind(V0, V40, V50, V100, V250)
+write_matex(round(total_future))
+```
+
+It appears that the earlier the inaccuracy, the worse the overall outcome accuracy compared to the original as we see the largest significant change when we add +4% survival rate on the first year of life among the fish population.
+
+
+
